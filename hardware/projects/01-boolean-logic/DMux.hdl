@@ -1,0 +1,28 @@
+/**
+ * Demultiplexor:
+ * [a, b] = [in, 0] if sel = 0
+ *          [0, in] if sel = 1
+ *
+ * Truth table:
+ * in sel | a b
+ *  0  0  | 0 0
+ *  0  1  | 0 0
+ *  1  0  | 1 0
+ *  1  1  | 0 1
+ *
+ */
+
+CHIP DMux {
+    IN in, sel;
+    OUT a, b;
+
+    PARTS:
+
+    Not(in=sel, out=sel1);
+    
+    // a receives in only when sel is 0.
+    And(a=sel1, b=in, out=a);
+
+    // b receives in only when sel is 1.
+    And(a=sel, b=in, out=b);
+}

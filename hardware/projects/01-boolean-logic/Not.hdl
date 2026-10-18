@@ -1,0 +1,20 @@
+/**
+  * Not gate:
+ * if (in) out = 0, else out = 1
+ *
+ * Truth table:
+ * in | out
+ *  0 |  1
+ *  1 |  0
+ *
+ */
+
+CHIP Not {
+    IN in;
+    OUT out;
+
+    PARTS:
+
+    // A NAND gate with both inputs tied together inverts its input.
+    Nand(a=in, b=in, out= out);
+}

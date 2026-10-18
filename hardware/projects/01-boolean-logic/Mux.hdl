@@ -1,0 +1,34 @@
+/**
+ * Multiplexor:
+ * if (sel = 0) out = a, else out = b
+ *
+ * Truth table:
+ * a b sel | out
+ * 0 0  0  |  0
+ * 0 0  1  |  0
+ * 0 1  0  |  0
+ * 0 1  1  |  1
+ * 1 0  0  |  1
+ * 1 0  1  |  0
+ * 1 1  0  |  1
+ * 1 1  1  |  1
+ *
+ */
+
+CHIP Mux {
+    IN a, b, sel;
+    OUT out;
+
+    PARTS:
+
+    Not(in=sel, out=sel1);
+
+    // Pass a when sel is 0; otherwise this path is 0.
+    And(a=a, b=sel1, out=out1);
+
+    // Pass b when sel is 1; otherwise this path is 0.
+    And(a=sel, b=b, out=out2);
+    
+    // Combine the selected input and the zero-valued other path.
+    Or(a=out1, b=out2, out=out);
+}

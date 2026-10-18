@@ -1,0 +1,25 @@
+/**
+ * And gate:
+ * if (a and b) out = 1, else out = 0 
+ *
+ * Truth table:
+ * a b | out
+ * 0 0 |  0
+ * 0 1 |  0
+ * 1 0 |  0
+ * 1 1 |  1
+ *
+ */
+
+CHIP And {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+
+    // NAND produces the inverse of a AND b.
+    Nand(a=a, b=b, out=x);
+    
+    // Invert the NAND result to obtain a AND b.
+    Nand(a=x, b=x, out=out);
+}
