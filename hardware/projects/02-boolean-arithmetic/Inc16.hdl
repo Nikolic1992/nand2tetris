@@ -1,0 +1,25 @@
+/**
+ * 16-bit Incrementer:
+ * Increments a 16-bit value by 1.
+ *
+ * out = in + 1
+ *
+ * Truth table (example):
+ * in                  | out
+ * 0000000000000000    | 0000000000000001
+ * 0000000000000001    | 0000000000000010
+ * 0000000000000010    | 0000000000000011
+ * 0000000000000011    | 0000000000000100
+ *
+ */
+
+CHIP Inc16 {
+    IN in[16];
+    OUT out[16];
+
+    PARTS:
+
+    // Add 1 to the input using the Add16 chip.
+    // The constant 1 is represented as a 16-bit bus.
+    Add16(a=in, b[0]=true, b[1..15]=false, out=out);
+}
