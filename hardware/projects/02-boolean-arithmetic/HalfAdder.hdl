@@ -1,0 +1,30 @@
+/**
+ * Half Adder:
+ * Computes the sum of two 1-bit inputs.
+ *
+ * sum   = a XOR b
+ * carry = a AND b
+ *
+ * Truth table:
+ * a b | sum carry
+ * 0 0 |  0    0
+ * 0 1 |  1    0
+ * 1 0 |  1    0
+ * 1 1 |  0    1
+ *
+ */
+
+CHIP HalfAdder {
+    IN a, b;
+    OUT sum, carry;
+
+    PARTS:
+
+    // XOR produces the sum bit.
+    // It returns 1 when the inputs are different.
+    Xor(a=a, b=b, out=sum);
+
+    // AND produces the carry bit.
+    // It returns 1 only when both inputs are 1.
+    And(a=a, b=b, out=carry);
+}
