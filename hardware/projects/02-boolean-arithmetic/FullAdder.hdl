@@ -1,0 +1,38 @@
+/**
+ * Full Adder:
+ * Computes the sum of three 1-bit inputs.
+ *
+ * sum   = a XOR b XOR c
+ * carry = (a AND b) OR (c AND (a XOR b))
+ *
+ * Truth table:
+ * a b c | sum carry
+ * 0 0 0 |  0    0
+ * 0 0 1 |  1    0
+ * 0 1 0 |  1    0
+ * 0 1 1 |  0    1
+ * 1 0 0 |  1    0
+ * 1 0 1 |  0    1
+ * 1 1 0 |  0    1
+ * 1 1 1 |  1    1
+ *
+ */
+
+CHIP FullAdder {
+    IN a, b, c;
+    OUT sum, carry;
+
+    PARTS:
+
+    // First HalfAdder: Add a and b.
+    // Produces an intermediate sum and carry.
+    HalfAdder(a=a, b=b, sum=sum1, carry=carry1);
+
+    // Second HalfAdder: Add the intermediate sum and c.
+    // Produces the final sum and a second carry.
+    HalfAdder(a=sum1, b=c, sum=sum, carry=carry2);
+
+    // OR combines both carry outputs.
+    // The final carry is 1 if either HalfAdder produces a carry.
+    Or(a=carry1, b=carry2, out=carry);
+}
