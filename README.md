@@ -14,8 +14,19 @@ implement basic Boolean gates and bus operations using the nand2tetris HDL:
 - Demultiplexers: `DMux`, `DMux4Way`, and `DMux8Way`
 - Bus operations: `Not16`, `And16`, `Or16`, and `Or8Way`
 
+## Project 2: Boolean Arithmetic
+
+The chips in [`hardware/projects/02-boolean-arithmetic`](hardware/projects/02-boolean-arithmetic)
+build up arithmetic operations from simple adders to the ALU:
+
+- Adders: `HalfAdder`, `FullAdder`, and 16-bit `Add16`
+- Incrementer: `Inc16`
+- `ALU`: the 16-bit arithmetic logic unit, which preprocesses the `x` and `y`
+  inputs, selects bitwise AND or addition, optionally negates the result, and
+  reports the `zr` and `ng` status flags
+
 ## Running the chips
 
 Use the nand2tetris Hardware Simulator to open and test the `.hdl` files. The
-official Project 1 instructions and test files are available from the
-[nand2tetris website](https://www.nand2tetris.org/project01).
+official project instructions and test files are available from the
+[nand2tetris website](https://www.nand2tetris.org/).
