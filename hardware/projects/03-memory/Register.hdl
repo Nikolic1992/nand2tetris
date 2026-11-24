@@ -1,0 +1,77 @@
+/**
+ * 16-bit register:
+ *
+ * Stores 16 bits of data.
+ *
+ * Each bit is stored using an individual Bit chip.
+ *
+ * If load is asserted (load = 1), the register loads
+ * the new 16-bit input value.
+ *
+ * If load is not asserted (load = 0), the register
+ * maintains its previously stored 16-bit value.
+ *
+ * All 16 Bit chips share the same load signal.
+ *
+ * Behavior:
+ * if (load(t)) out(t+1) = in(t)
+ * else          out(t+1) = out(t)
+ */
+
+CHIP Register {
+    IN in[16], load;
+    OUT out[16];
+
+    PARTS:
+
+    // Each Bit chip stores one bit of the 16-bit input bus.
+    // Every Bit chip receives the same load signal.
+    //
+    // Bit 0 stores in[0] and produces out[0].
+    Bit(in=in[0], load=load, out=out[0]);
+
+    // Bit 1 stores in[1] and produces out[1].
+    Bit(in=in[1], load=load, out=out[1]);
+
+    // Bit 2 stores in[2] and produces out[2].
+    Bit(in=in[2], load=load, out=out[2]);
+
+    // Bit 3 stores in[3] and produces out[3].
+    Bit(in=in[3], load=load, out=out[3]);
+
+    // Bit 4 stores in[4] and produces out[4].
+    Bit(in=in[4], load=load, out=out[4]);
+
+    // Bit 5 stores in[5] and produces out[5].
+    Bit(in=in[5], load=load, out=out[5]);
+
+    // Bit 6 stores in[6] and produces out[6].
+    Bit(in=in[6], load=load, out=out[6]);
+
+    // Bit 7 stores in[7] and produces out[7].
+    Bit(in=in[7], load=load, out=out[7]);
+
+    // Bit 8 stores in[8] and produces out[8].
+    Bit(in=in[8], load=load, out=out[8]);
+
+    // Bit 9 stores in[9] and produces out[9].
+    Bit(in=in[9], load=load, out=out[9]);
+
+    // Bit 10 stores in[10] and produces out[10].
+    Bit(in=in[10], load=load, out=out[10]);
+
+    // Bit 11 stores in[11] and produces out[11].
+    Bit(in=in[11], load=load, out=out[11]);
+
+    // Bit 12 stores in[12] and produces out[12].
+    Bit(in=in[12], load=load, out=out[12]);
+
+    // Bit 13 stores in[13] and produces out[13].
+    Bit(in=in[13], load=load, out=out[13]);
+
+    // Bit 14 stores in[14] and produces out[14].
+    Bit(in=in[14], load=load, out=out[14]);
+
+    // Bit 15 stores in[15] and produces out[15].
+    Bit(in=in[15], load=load, out=out[15]);
+}
