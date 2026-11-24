@@ -1,0 +1,45 @@
+/**
+ * 1-bit register:
+ *
+ * Stores a single bit of data.
+ *
+ * If load is asserted (load = 1), the register loads
+ * the new input value.
+ *
+ * If load is not asserted (load = 0), the register
+ * keeps its previously stored value.
+ *
+ * The DFF (Data Flip-Flop)  updates its output on the next clock cycle.
+ *
+ * Behavior:
+ * if (load(t)) out(t+1) = in(t)
+ * else          out(t+1) = out(t)
+ */
+
+CHIP Bit {
+    IN in, load;
+    OUT out;
+
+    PARTS:
+
+    // MUX selects between the previously stored value and the new input.
+    // a = outDff: previously stored value.
+    // b = in:     new input value.
+    // sel = load:
+    //   0 -> keep the previous value (a).
+    //   1 -> load the new input value (b).
+    // The selected value is sent to the DFF.
+    Mux(a=outDff, b=in, sel=load, out=muxOut);
+
+    // DFF (Data Flip-Flop) stores the selected value.
+    // Its output changes on the next clock cycle.
+    // outDff represents the currently stored bit.
+    DFF(in=muxOut, out=outDff);
+
+    // Pass the stored value to the external output.
+    // OR-ing a signal with itself does not change its value:
+    // 0 OR 0 = 0
+    // 1 OR 1 = 1
+    // Therefore, out receives the same value as outDff.
+    Or(a=outDff, b=outDff, out=out);
+}
