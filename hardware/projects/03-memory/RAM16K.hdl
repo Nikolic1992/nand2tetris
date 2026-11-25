@@ -1,0 +1,74 @@
+/**
+ * Memory of 16K 16-bit registers.
+ *
+ * RAM16K consists of 4 RAM4K chips.
+ * Each RAM4K contains 4,096 registers, giving us:
+ * 4 * 4,096 = 16,384 registers.
+ *
+ * Total memory capacity:
+ * 16,384 registers * 16 bits = 262,144 bits
+ * 262,144 bits = 32,768 bytes = 32 KB.
+ *
+ * If load is asserted, the value of the register selected by
+ * address is set to in. Otherwise, the value does not change.
+ *
+ * The value of the selected register is emitted by out.
+ */
+
+CHIP RAM16K {
+    IN in[16], load, address[14];
+    OUT out[16];
+
+    PARTS:
+
+    // ---------------------------------------------------------
+    // 1. WRITE SELECTION
+    // ---------------------------------------------------------
+    // The 14-bit address is divided into two parts:
+    //
+    // address[0..11] -> selects one of 4,096 registers inside RAM4K.
+    // address[12..13] -> selects one of 4 RAM4K chips.
+    //
+    // DMux4Way distributes the load signal to exactly one
+    // of the four RAM4K chips.
+
+    DMux4Way(
+        in=load,
+        sel=address[12..13],
+        a=loada,
+        b=loadb,
+        c=loadc,
+        d=loadd
+    );
+
+    // ---------------------------------------------------------
+    // 2. FOUR RAM4K CHIPS
+    // ---------------------------------------------------------
+    // Every RAM4K receives the same 16-bit input.
+    // Only the selected RAM4K receives load=1.
+    //
+    // address[0..11] is passed to each RAM4K to select
+    // one of its 4,096 internal registers.
+
+    RAM4K(in=in, load=loada, address=address[0..11], out=outa);
+    RAM4K(in=in, load=loadb, address=address[0..11], out=outb);
+    RAM4K(in=in, load=loadc, address=address[0..11], out=outc);
+    RAM4K(in=in, load=loadd, address=address[0..11], out=outd);
+
+    // ---------------------------------------------------------
+    // 3. READ SELECTION
+    // ---------------------------------------------------------
+    // Mux4Way16 selects the output of the RAM4K chip
+    // corresponding to address[12..13].
+    //
+    // The selected 16-bit value is sent to the final output.
+
+    Mux4Way16(
+        a=outa,
+        b=outb,
+        c=outc,
+        d=outd,
+        sel=address[12..13],
+        out=out
+    );
+}
