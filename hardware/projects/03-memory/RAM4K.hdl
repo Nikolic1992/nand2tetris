@@ -1,0 +1,86 @@
+/**
+ * Memory of 4K 16-bit registers.
+ *
+ * RAM4K consists of 8 RAM512 chips.
+ * Each RAM512 contains 512 registers, giving us:
+ * 8 * 512 = 4,096 registers.
+ *
+ * Total memory capacity:
+ * 4,096 registers * 16 bits = 65,536 bits
+ * 65,536 bits = 8,192 bytes = 8 KB.
+ *
+ * If load is asserted, the value of the register selected by
+ * address is set to in. Otherwise, the value does not change.
+ *
+ * The value of the selected register is emitted by out.
+ */
+
+CHIP RAM4K {
+    IN in[16], load, address[12];
+    OUT out[16];
+
+    PARTS:
+
+    // ---------------------------------------------------------
+    // 1. WRITE SELECTION
+    // ---------------------------------------------------------
+    // The 12-bit address is divided into two parts:
+    //
+    // address[0..8] -> selects one of 512 registers inside RAM512.
+    // address[9..11] -> selects one of 8 RAM512 groups.
+    //
+    // DMux8Way distributes the load signal to exactly one
+    // of the eight RAM512 chips.
+
+    DMux8Way(
+        in=load,
+        sel=address[9..11],
+        a=loada,
+        b=loadb,
+        c=loadc,
+        d=loadd,
+        e=loade,
+        f=loadf,
+        g=loadg,
+        h=loadh
+    );
+
+    // ---------------------------------------------------------
+    // 2. EIGHT RAM512 CHIPS
+    // ---------------------------------------------------------
+    // Every RAM512 receives the same 16-bit input.
+    // Only the selected RAM512 receives load=1.
+    //
+    // address[0..8] is passed to each RAM512 to select
+    // one of its 512 internal registers.
+
+    RAM512(in=in, load=loada, address=address[0..8], out=outa);
+    RAM512(in=in, load=loadb, address=address[0..8], out=outb);
+    RAM512(in=in, load=loadc, address=address[0..8], out=outc);
+    RAM512(in=in, load=loadd, address=address[0..8], out=outd);
+    RAM512(in=in, load=loade, address=address[0..8], out=oute);
+    RAM512(in=in, load=loadf, address=address[0..8], out=outf);
+    RAM512(in=in, load=loadg, address=address[0..8], out=outg);
+    RAM512(in=in, load=loadh, address=address[0..8], out=outh);
+
+    // ---------------------------------------------------------
+    // 3. READ SELECTION
+    // ---------------------------------------------------------
+    // Mux8Way16 selects the output of the RAM512 chip
+    // corresponding to address[9..11].
+    //
+    // The selected 16-bit value is sent to the final output.
+
+    Mux8Way16(
+        a=outa,
+        b=outb,
+        c=outc,
+        d=outd,
+        e=oute,
+        f=outf,
+        g=outg,
+        h=outh,
+        sel=address[9..11],
+        out=out
+    );
+}
