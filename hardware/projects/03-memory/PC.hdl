@@ -1,0 +1,89 @@
+/**
+ * A 16-bit program counter.
+ *
+ * The PC stores the address of the next instruction
+ * to be executed by the CPU.
+ *
+ * Its behavior follows this priority:
+ *
+ * 1. If reset is asserted, out is set to 0.
+ * 2. Else if load is asserted, in is loaded into the PC.
+ * 3. Else if inc is asserted, the current value is incremented.
+ * 4. Otherwise, the current value is retained.
+ *
+ * The PC is implemented using a Register, an Inc16,
+ * and multiplexers to select the next value.
+ */
+
+CHIP PC {
+    IN in[16], reset, load, inc;
+    OUT out[16];
+
+    PARTS:
+
+    // ---------------------------------------------------------
+    // 1. INCREMENT THE CURRENT VALUE
+    // ---------------------------------------------------------
+    // Inc16 increases the current PC value by 1.
+    // This value is used when inc=1 and load=0.
+
+    Inc16(in=pcOut, out=incremented);
+
+    // ---------------------------------------------------------
+    // 2. SELECT BETWEEN HOLDING AND INCREMENTING
+    // ---------------------------------------------------------
+    // If inc=0, keep the current PC value.
+    // If inc=1, use the incremented value.
+    //
+    // This Mux handles the increment operation.
+
+    Mux16(
+        a=pcOut,
+        b=incremented,
+        sel=inc,
+        out=afterInc
+    );
+
+    // ---------------------------------------------------------
+    // 3. SELECT BETWEEN INCREMENTING AND LOADING
+    // ---------------------------------------------------------
+    // If load=0, use the result from the previous Mux.
+    // If load=1, load the external input value.
+    //
+    // Load has priority over increment.
+
+    Mux16(
+        a=afterInc,
+        b=in,
+        sel=load,
+        out=afterLoad
+    );
+
+    // ---------------------------------------------------------
+    // 4. HANDLE RESET
+    // ---------------------------------------------------------
+    // If reset=1, select 0.
+    // Otherwise, use the value selected above.
+    //
+    // false is a built-in constant representing 0.
+
+    Mux16(
+        a=afterLoad,
+        b=false,
+        sel=reset,
+        out=nextPC
+    );
+
+    // ---------------------------------------------------------
+    // 5. STORE THE NEXT PC VALUE
+    // ---------------------------------------------------------
+    // The Register stores the selected value.
+    // Its output feeds back into the multiplexers
+    // and is also connected to the external output.
+
+    Register(in=nextPC, load=true, out=pcOut);
+
+    // Send the current PC value to the external output.
+
+    Or16(a=pcOut, b=pcOut, out=out);
+}
