@@ -1,0 +1,100 @@
+/**
+ * RAM8:
+ *
+ * Memory consisting of eight 16-bit registers.
+ *
+ * Each register can store 16 bits of data.
+ * Since there are 8 registers, the total memory capacity is:
+ *
+ * 8 registers * 16 bits = 128 bits.
+ *
+ * The 3-bit address input selects one of the eight registers.
+ *
+ * Writing:
+ * If load = 1, the selected register loads the input value.
+ * All other registers keep their previously stored values.
+ *
+ * Reading:
+ * The output displays the 16-bit value stored in the
+ * register selected by address.
+ *
+ * The same address is used for both reading and writing.
+ */
+
+CHIP RAM8 {
+    IN in[16], load, address[3];
+    OUT out[16];
+
+    PARTS:
+
+    // DMux8Way distributes the load signal to one of eight outputs.
+    //
+    // The 3-bit address determines which output receives load.
+    // Only the selected register receives load = 1.
+    // All other registers receive load = 0 and keep their values.
+    //
+    // Address mapping:
+    // 000 -> l0
+    // 001 -> l1
+    // 010 -> l2
+    // 011 -> l3
+    // 100 -> l4
+    // 101 -> l5
+    // 110 -> l6
+    // 111 -> l7
+    DMux8Way(in=load, sel=address,
+             a=l0, b=l1, c=l2, d=l3,
+             e=l4, f=l5, g=l6, h=l7);
+
+    // Register 0:
+    // Receives the input data bus.
+    // Loads data only when its load signal (l0) is asserted.
+    // Stores 16 bits and exposes them through r0.
+    Register(in=in, load=l0, out=r0);
+
+    // Register 1:
+    // Loads data only when address selects register 1.
+    Register(in=in, load=l1, out=r1);
+
+    // Register 2:
+    // Loads data only when address selects register 2.
+    Register(in=in, load=l2, out=r2);
+
+    // Register 3:
+    // Loads data only when address selects register 3.
+    Register(in=in, load=l3, out=r3);
+
+    // Register 4:
+    // Loads data only when address selects register 4.
+    Register(in=in, load=l4, out=r4);
+
+    // Register 5:
+    // Loads data only when address selects register 5.
+    Register(in=in, load=l5, out=r5);
+
+    // Register 6:
+    // Loads data only when address selects register 6.
+    Register(in=in, load=l6, out=r6);
+
+    // Register 7:
+    // Loads data only when address selects register 7.
+    Register(in=in, load=l7, out=r7);
+
+    // Mux8Way16 selects the output of one of the eight registers.
+    //
+    // The same 3-bit address determines which register's
+    // 16-bit stored value is sent to the external output.
+    //
+    // Address mapping:
+    // 000 -> r0
+    // 001 -> r1
+    // 010 -> r2
+    // 011 -> r3
+    // 100 -> r4
+    // 101 -> r5
+    // 110 -> r6
+    // 111 -> r7
+    Mux8Way16(a=r0, b=r1, c=r2, d=r3,
+              e=r4, f=r5, g=r6, h=r7,
+              sel=address, out=out);
+}
