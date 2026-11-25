@@ -1,0 +1,86 @@
+/**
+ * Memory of 512 16-bit registers.
+ *
+ * RAM512 consists of 8 RAM64 chips.
+ * Each RAM64 contains 64 registers, giving us:
+ * 8 * 64 = 512 registers.
+ *
+ * Total memory capacity:
+ * 512 registers * 16 bits = 8,192 bits
+ * 8,192 bits = 1,024 bytes = 1 KB.
+ *
+ * If load is asserted, the value of the register selected by
+ * address is set to in. Otherwise, the value does not change.
+ *
+ * The value of the selected register is emitted by out.
+ */
+
+CHIP RAM512 {
+    IN in[16], load, address[9];
+    OUT out[16];
+
+    PARTS:
+
+    // ---------------------------------------------------------
+    // 1. WRITE SELECTION
+    // ---------------------------------------------------------
+    // The 9-bit address is divided into two parts:
+    //
+    // address[0..2] -> selects one of 8 RAM64 groups.
+    // address[3..8] -> selects one of 64 registers inside RAM64.
+    //
+    // DMux8Way distributes the load signal to exactly one
+    // of the eight RAM64 chips.
+
+    DMux8Way(
+        in=load,
+        sel=address[0..2],
+        a=loada,
+        b=loadb,
+        c=loadc,
+        d=loadd,
+        e=loade,
+        f=loadf,
+        g=loadg,
+        h=loadh
+    );
+
+    // ---------------------------------------------------------
+    // 2. EIGHT RAM64 CHIPS
+    // ---------------------------------------------------------
+    // Every RAM64 receives the same 16-bit input.
+    // Only the selected RAM64 receives load=1.
+    //
+    // address[3..8] is passed to each RAM64 to select
+    // one of its 64 internal registers.
+
+    RAM64(in=in, load=loada, address=address[3..8], out=outa);
+    RAM64(in=in, load=loadb, address=address[3..8], out=outb);
+    RAM64(in=in, load=loadc, address=address[3..8], out=outc);
+    RAM64(in=in, load=loadd, address=address[3..8], out=outd);
+    RAM64(in=in, load=loade, address=address[3..8], out=oute);
+    RAM64(in=in, load=loadf, address=address[3..8], out=outf);
+    RAM64(in=in, load=loadg, address=address[3..8], out=outg);
+    RAM64(in=in, load=loadh, address=address[3..8], out=outh);
+
+    // ---------------------------------------------------------
+    // 3. READ SELECTION
+    // ---------------------------------------------------------
+    // Mux8Way16 selects the output of the RAM64 chip
+    // corresponding to address[0..2].
+    //
+    // The selected 16-bit value is sent to the final output.
+
+    Mux8Way16(
+        a=outa,
+        b=outb,
+        c=outc,
+        d=outd,
+        e=oute,
+        f=outf,
+        g=outg,
+        h=outh,
+        sel=address[0..2],
+        out=out
+    );
+}
