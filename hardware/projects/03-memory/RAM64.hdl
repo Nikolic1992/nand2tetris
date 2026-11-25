@@ -1,0 +1,107 @@
+/**
+ * RAM64:
+ *
+ * Memory consisting of sixty-four 16-bit registers.
+ *
+ * The memory is organized into eight groups,
+ * with each group containing eight 16-bit registers.
+ *
+ * Total memory capacity:
+ *
+ * 64 registers * 16 bits = 1024 bits.
+ *
+ * The 6-bit address input selects one of the 64 registers.
+ *
+ * Address breakdown:
+ * - address[0..2] selects one of eight registers
+ *   inside a RAM8 group.
+ *
+ * - address[3..5] selects one of the eight RAM8 groups.
+ *
+ * Writing:
+ * If load = 1, the selected register loads the input value.
+ * All other registers maintain their previous values.
+ *
+ * Reading:
+ * The output displays the 16-bit value stored in
+ * the register selected by the 6-bit address.
+ *
+ * The same address is used for both reading and writing.
+ */
+
+CHIP RAM64 {
+    IN in[16], load, address[6];
+    OUT out[16];
+
+    PARTS:
+
+    // DMux8Way selects which RAM8 group receives the load signal.
+    //
+    // The upper three address bits (address[3..5])
+    // determine which of the eight RAM8 groups is enabled.
+    //
+    // Only the selected group receives load = 1.
+    // All other groups receive load = 0.
+    //
+    // Group selection:
+    // 000 -> loada (RAM8 group A)
+    // 001 -> loadb (RAM8 group B)
+    // 010 -> loadc (RAM8 group C)
+    // 011 -> loadd (RAM8 group D)
+    // 100 -> loade (RAM8 group E)
+    // 101 -> loadf (RAM8 group F)
+    // 110 -> loadg (RAM8 group G)
+    // 111 -> loadh (RAM8 group H)
+    DMux8Way(
+        in=load,
+        sel=address[3..5],
+        a=loada, b=loadb, c=loadc, d=loadd,
+        e=loade, f=loadf, g=loadg, h=loadh
+    );
+
+    // RAM8 group A:
+    // Handles registers 0-7.
+    // The lower three address bits select one of its eight registers.
+    RAM8(in=in, load=loada, address=address[0..2], out=outa);
+
+    // RAM8 group B:
+    // Handles registers 8-15.
+    RAM8(in=in, load=loadb, address=address[0..2], out=outb);
+
+    // RAM8 group C:
+    // Handles registers 16-23.
+    RAM8(in=in, load=loadc, address=address[0..2], out=outc);
+
+    // RAM8 group D:
+    // Handles registers 24-31.
+    RAM8(in=in, load=loadd, address=address[0..2], out=outd);
+
+    // RAM8 group E:
+    // Handles registers 32-39.
+    RAM8(in=in, load=loade, address=address[0..2], out=oute);
+
+    // RAM8 group F:
+    // Handles registers 40-47.
+    RAM8(in=in, load=loadf, address=address[0..2], out=outf);
+
+    // RAM8 group G:
+    // Handles registers 48-55.
+    RAM8(in=in, load=loadg, address=address[0..2], out=outg);
+
+    // RAM8 group H:
+    // Handles registers 56-63.
+    RAM8(in=in, load=loadh, address=address[0..2], out=outh);
+
+    // Mux8Way16 selects the output of one of the eight RAM8 groups.
+    //
+    // The upper three address bits (address[3..5])
+    // determine which RAM8 group's output is selected.
+    //
+    // The selected 16-bit value is sent to the external output.
+    Mux8Way16(
+        a=outa, b=outb, c=outc, d=outd,
+        e=oute, f=outf, g=outg, h=outh,
+        sel=address[3..5],
+        out=out
+    );
+}
